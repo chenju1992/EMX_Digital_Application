@@ -1,43 +1,4 @@
 <?php
-
-function helper(&$sub_pieces,$sign,$current,$start,$end){
-
-//    echo($sign);
-//    echo($start);
-//    echo($end);
-    if($current == $end){
-        $sub_pieces[$start][$end] = $sign;
-        if($sign == '>'){
-            $sub_pieces[$end][$start] = '<';
-        }
-        if($sign == '<'){
-            $sub_pieces[$end][$start] = '>';
-        }
-        if($sign == '='){
-            $sub_pieces[$end][$start] = '=';
-        }
-
-
-         //echo('Finish');
-        //echo($sub_pieces[$start][$end]);
-
-        return;
-    }
-    for($next = 1; $next <=4; $next++){
-        if($next == $current){
-            continue;
-        }
-
-        if($sub_pieces[$current][$next] == $sign){
-//            echo($sign);
-//            echo($start);
-//            echo($next);
-            helper($sub_pieces,$sign,$next,$start,$end);
-        }
-    }
-//    echo('Finish');
-    return;
-}
 if ($_GET["q"] == "Ping"){
     echo "OK";
 }
@@ -54,78 +15,6 @@ if ($_GET["q"] == "Phone"){
 if ($_GET["q"] == "Referrer"){
     echo "I was referred by Stephanie Wiernik";
 }
-
-
-
-if ($_GET["q"] == "Puzzle"){
-    $input_string = $_GET["d"];
-//    echo $input_string;
-    $pieces = explode(':',$input_string);
-    $sub_pieces = array_slice(preg_split('/[\s+]+/',$pieces[1]),1);
-    for($i = 1; $i <= 4; $i++){
-        $sub_pieces[$i][$i] = '=';
-    }
-    for($i = 1; $i <= 4; $i++){
-        for($j = 1; $j <= 4; $j++){
-            if($sub_pieces[$i][$j] == '-'){
-                if($sub_pieces[$j][$i] == '>'){
-                    $sub_pieces[$i][$j] = '<';
-                }
-                if($sub_pieces[$j][$i] == '<'){
-                    $sub_pieces[$i][$j] = '>';
-                }
-                if($sub_pieces[$j][$i] == '='){
-                    $sub_pieces[$i][$j] = '=';
-                }
-            }
-        }
-    }
-
-//    echo(' ABCD');
-//    for($i = 1; $i <= 4; $i++) {
-//        echo "\n";
-//        for ($j = 0; $j <= 4; $j++) {
-//            echo $sub_pieces[$i][$j];
-//        }
-//    }
-
-    for($i = 1; $i <= 4; $i++){
-        for($j = 1+$i ; $j <= 4; $j++){
-            if($sub_pieces[$i][$j] == '-'){
-                //echo($sub_pieces[$i][$j]);
-                helper($sub_pieces,'<',$i,$i,$j);
-                helper($sub_pieces,'>',$i,$i,$j);
-                helper($sub_pieces,'=',$i,$i,$j);
-
-            }
-        }
-    }
-
-    echo(' ABCD');
-    for($i = 1; $i <= 4; $i++){
-        echo "\n";
-        for($j = 0; $j <= 4; $j++){
-            echo $sub_pieces[$i][$j];
-        }
-//            if($sub_pieces[$i][$j] == '>' and $sub_pieces[$j][$i] == '-'){
-//                $sub_pieces[$j][$i] = '<';
-//                echo $sub_pieces[$j][$i];
-//            }
-//            if($sub_pieces[$i][$j] == '<' and $sub_pieces[$j][$i] == '-'){
-//                $sub_pieces[$j][$i] = '>';
-//                echo $sub_pieces[$j][$i];
-//            }
-//        }
-    }
-
-
-
-
-
-//    echo $sub_pieces[4][1];
-
-}
-
 if ($_GET["q"] == "Years"){
     echo "0-1 year";
 }
@@ -146,5 +35,88 @@ if($_GET["q"] == "Source"){
     echo "https://github.com/chenju1992/EMX_Digital_Application/";
 }
 
-#phpinfo();
+//The function below uses dfs to search the transitive relationship i.e. a < b, b < c implies a < c
+function helper(&$sub_pieces,$sign,$current,$start,$end){
+
+    if($current == $end){
+        $sub_pieces[$start][$end] = $sign;
+        if($sign == '>'){
+            $sub_pieces[$end][$start] = '<';
+        }
+        if($sign == '<'){
+            $sub_pieces[$end][$start] = '>';
+        }
+        if($sign == '='){
+            $sub_pieces[$end][$start] = '=';
+        }
+
+        return;
+    }
+    for($next = 1; $next <=4; $next++){
+        //skip itself
+        if($next == $current){
+            continue;
+        }
+
+        if($sub_pieces[$current][$next] == $sign){
+
+            helper($sub_pieces,$sign,$next,$start,$end);
+        }
+    }
+    return;
+}
+
+
+if ($_GET["q"] == "Puzzle"){
+    $input_string = $_GET["d"];
+    $pieces = explode(':',$input_string);
+    $sub_pieces = array_slice(preg_split('/[\s+]+/',$pieces[1]),1);
+    // $sub_pieces looks like 
+    
+    $n = count($sub_pieces) - 2; // there maybe a "\n" at the back
+    //Deal with the case that a = a, b = b etc.
+    for($i = 1; $i <= $n; $i++){
+        $sub_pieces[$i][$i] = '=';
+    }
+    //Bascally, if we know a > b then it is obvious b < a,the nested for-loop below is trying to get information from this 
+    for($i = 1; $i <= $n; $i++){
+        for($j = 1; $j <= $n; $j++){
+            if($sub_pieces[$i][$j] == '-'){
+                if($sub_pieces[$j][$i] == '>'){
+                    $sub_pieces[$i][$j] = '<';
+                }
+                if($sub_pieces[$j][$i] == '<'){
+                    $sub_pieces[$i][$j] = '>';
+                }
+                if($sub_pieces[$j][$i] == '='){
+                    $sub_pieces[$i][$j] = '=';
+                }
+            }
+        }
+    }
+
+    //As metioned above, the code below trying to deal with reflecsive relation
+    for($i = 1; $i <= $n; $i++){
+        for($j = 1+$i ; $j <= $n; $j++){
+            if($sub_pieces[$i][$j] == '-'){
+                //echo($sub_pieces[$i][$j]);
+                helper($sub_pieces,'<',$i,$i,$j);
+                helper($sub_pieces,'>',$i,$i,$j);
+                helper($sub_pieces,'=',$i,$i,$j);
+
+            }
+        }
+    }
+    
+// The code below prints the result
+    echo(' ABCD');
+    for($i = 1; $i <= $n; $i++){
+        echo "\n";
+        for($j = 0; $j <= $n; $j++){
+            echo $sub_pieces[$i][$j];
+        }
+    }
+
+}
+
 ?>
