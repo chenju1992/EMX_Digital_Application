@@ -53,7 +53,7 @@ function helper(&$sub_pieces,$sign,$current,$start,$end){
         return;
     }
     $n = count($sub_pieces) - 2; // there maybe a "\n" at the back
-    for($next = 1; $next <=4; $next++){
+    for($next = 1; $next <= n; $next++){
         //skip itself
         if($next == $current){
             continue;
