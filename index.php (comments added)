@@ -72,6 +72,12 @@ if ($_GET["q"] == "Puzzle"){
     $pieces = explode(':',$input_string);
     $sub_pieces = array_slice(preg_split('/[\s+]+/',$pieces[1]),1);
     // $sub_pieces looks like 
+    //  A B C D  sub_pieces[0]
+   // A - - - >  sub_pieces[1]
+   // B - = - -  sub_pieces[2]
+   // C - < - -  sub_pieces[3]
+   // D - > - -  sub_pieces[4]
+   // \n (maybe) sub_pieces[5]        
     
     $n = count($sub_pieces) - 2; // there maybe a "\n" at the back
     //Deal with the case that a = a, b = b etc.
