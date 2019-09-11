@@ -26,7 +26,7 @@ if ($_GET["q"] == "Degree"){
     echo "Master of Science in Mathematics from the New York University";
 }
 if ($_GET["q"] == "Position"){
-    echo "I am applying for the data scientist position for EMC Digital.";
+    echo "I am applying for the data scientist position for EM Digital.";
 }
 if($_GET["q"] == "Resume"){
     echo "https://github.com/chenju1992/EMX_Digital_Application/";
